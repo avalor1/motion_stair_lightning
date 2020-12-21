@@ -16,7 +16,7 @@ CRGB leds[NUM_LEDS];
 #define BRIGHTNESS          25
 #define FRAMES_PER_SECOND  120
 
-const int ldrDark = 825;    // at which analog value we consider it to be dark
+const int ldrDark = 780;    // at which analog value we consider it to be dark
 const int ldrBright = 300;  // at which analog value we consider it to be bright
 const unsigned long SEGMENT_SWITCH_ON_DELAY = 400; //delay in ms between segment turn on
 const unsigned long SEGMENT_SWITCH_OFF_DELAY = 300; //delay in ms between segment turn off
