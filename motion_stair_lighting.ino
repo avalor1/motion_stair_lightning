@@ -163,7 +163,7 @@ void downstairsUpOn( const char* ledColour ) {
   if ( downstairsUpSegmentIndexNumber < LED_SEGMENT_NUMBER ) {
     // loop from beginning of array number to beginning of next segment (0 to 16 > 17 to 33 > 34 to 50 and so on)
     for (int downstairsUpLedCounter = SEGMENTS_UP[downstairsUpSegmentIndexNumber]; downstairsUpLedCounter < SEGMENTS_UP[downstairsUpSegmentIndexNumber + 1]; downstairsUpLedCounter++ ) {
-      //leds[downstairsUpLedCounter] = CRGB::ledColour;  // write color to LED
+      leds[downstairsUpLedCounter] = CRGB::ledColour;  // write color to LED
 
       // debug stuff
       //Serial.println((String)"LED Counter: " + downstairsUpLedCounter);
