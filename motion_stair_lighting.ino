@@ -7,12 +7,12 @@
 #define DATA_PIN    7   //LED data pin
 #define PIR1_PIN    5   //pin for PIR sensor 1
 #define PIR2_PIN    6   //pin for PIR sensor 1
-#define LED_TYPE    WS2812B
-#define COLOR_ORDER GRB
+#define LED_TYPE    WS2812B //type of LED strip
+#define COLOR_ORDER GRB // order of colors
 #define NUM_LEDS    289     //number of leds
-CRGB leds[NUM_LEDS];
-#define BRIGHTNESS          25
-#define FRAMES_PER_SECOND  120
+#define BRIGHTNESS          25  // default brightness
+//#define FRAMES_PER_SECOND  120
+CRGB leds[NUM_LEDS];  //set CRGB color struct to all leds
 
 // set some colors
 // http://fastled.io/docs/3.1/struct_c_r_g_b.html
@@ -29,9 +29,7 @@ const unsigned long SEGMENTS_SWITCH_ON_DELAY = 400;
 const unsigned long SEGMENTS_SWITCH_OFF_DELAY = 300;
 const int LED_SEGMENT_NUMBER = 17;
 const int SEGMENTS_UP[17] = { 0, 17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255, 272 };
-const int SEGMENTS_DOWN[17] = {289, 272, 255, 238, 221, 204, 187, 170, 153, 136, 119, 102, 85, 68, 51, 34, 17};
-
-
+const int SEGMENTS_DOWN[17] = { 289, 272, 255, 238, 221, 204, 187, 170, 153, 136, 119, 102, 85, 68, 51, 34, 17 };
 
 // ---------- VARIABLES (will change) -------------------
 unsigned long currentTime = 0;
@@ -80,14 +78,18 @@ void setup() {
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
 
-
   // clear everything before
   FastLED.clear();
   FastLED.show();
-  
-  startTimeUp = currentTime;             // set initial startTime to time which was already used for initialisation
-  startTimeDown = currentTime;           // set initial startTime to time which was already used for initialisation
-  delay(1500);                           // wait a short time to get PIR sensors ready
+
+  // wait a short time to get PIR sensors ready
+  delay(1500);
+
+  // set initial startTime Upstairs to time which was already used for initialisation
+  startTimeUp = currentTime;
+  // set initial startTime Downstairs to time which was already used for initialisation
+  startTimeDown = currentTime;
+
 }
 
 void loop() {
@@ -112,14 +114,12 @@ void loop() {
       downstairsUpOn(Gold);
       FastLED.show();
       startTimeUp = currentTime;
-      //digitalWrite(DATA_PIN, !digitalRead(DATA_PIN));
     }
   } else if ( pirDownstairsTriggered == true ) {
     if ( currentTime - startTimeUp >= SEGMENTS_SWITCH_ON_DELAY ) {
       downstairsUpOn(Gold);
       FastLED.show();
       startTimeUp = currentTime;
-      //digitalWrite(DATA_PIN, !digitalRead(DATA_PIN));
     }
   }
 
@@ -131,14 +131,12 @@ void loop() {
       upstairsDownOn(Magenta);
       FastLED.show();
       startTimeDown = currentTime;
-      //digitalWrite(DATA_PIN, !digitalRead(DATA_PIN));
     }
   } else if ( pirUpstairsTriggered == true ) {
     if ( currentTime - startTimeDown >= SEGMENTS_SWITCH_ON_DELAY ) {
       upstairsDownOn(Magenta);
       FastLED.show();
       startTimeDown = currentTime;
-      //digitalWrite(DATA_PIN, !digitalRead(DATA_PIN));
     }
   }
 
@@ -189,7 +187,7 @@ void downstairsUpOn( CRGB ledColour ) {
     Serial.println((String) "downstairsUpLedCounterExport: " + downstairsUpLedCounterExport);
 
     // add else if for state change when animation is complete and to start timing for turning LEDs off
-  } else if ( downstairsUpSegmentIndexNumber > LED_SEGMENT_NUMBER) {
+  } else if ( downstairsUpSegmentIndexNumber == LED_SEGMENT_NUMBER) {
     // set state for animation to complete
     downstairsUpOnAnimationComplete = true;
     // only record Animation complete time once
@@ -214,15 +212,15 @@ void downstairsUpOff(CRGB ledColour) {
     }
     downstairsUpSegmentIndexNumber++; // increase index number of up index to get the next element in array for next loop
 
-    // debug stuff
-    Serial.println((String)"Segment array element value " + SEGMENTS_UP[downstairsUpSegmentIndexNumber]);
+     // debug stuff
+    Serial.println((String)"SEGMENTS_UP current segment value: " + SEGMENTS_UP[downstairsUpSegmentIndexNumber]);
     //Serial.println((String) "downstairsUpSegmentIndexNumber: " + downstairsUpSegmentIndexNumber);
-    //Serial.println((String) "downstairsUpLedCounterExport: " + downstairsUpLedCounterExport);
+    Serial.println((String) "downstairsUpLedCounterExport: " + downstairsUpLedCounterExport);
 
     // set animation trigger state to true to inform loop about already started turning off routine
     downstairsUpOffAnimationTriggered = true;
 
-    } else if ( downstairsUpSegmentIndexNumber > LED_SEGMENT_NUMBER ) {
+    } else if ( downstairsUpSegmentIndexNumber == LED_SEGMENT_NUMBER ) {
     // reset variables to allow toggling of ON routine again
     downstairsUpOnAnimationCompleteTime = 0;
     downstairsUpOnAnimationComplete = false;
@@ -256,7 +254,7 @@ void upstairsDownOn(CRGB ledColour) {
     Serial.println("-------------------------------");
 
     // add else if for state change when animation is complete and to start timing for turning LEDs off
-  } else if ( upstairsDownSegmentIndexNumber > LED_SEGMENT_NUMBER) {
+  } else if ( upstairsDownSegmentIndexNumber == LED_SEGMENT_NUMBER) {
     // set state for animation to complete
     upstairsDownOnAnimationComplete = true;
     // only record Animation complete time once
@@ -290,7 +288,7 @@ void upstairsDownOff(CRGB ledColour) {
     // set animation trigger state to true to inform loop about already started turning off routine
     upstairsDownOffAnimationTriggered = true;
 
-  } else if ( upstairsDownSegmentIndexNumber > LED_SEGMENT_NUMBER ) {
+  } else if ( upstairsDownSegmentIndexNumber == LED_SEGMENT_NUMBER ) {
     // reset variables to allow toggling of ON routine again
     upstairsDownOnAnimationCompleteTime = 0;
     upstairsDownOnAnimationComplete = false;
