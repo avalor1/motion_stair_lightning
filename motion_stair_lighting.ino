@@ -29,7 +29,7 @@ const unsigned long SEGMENTS_SWITCH_ON_DELAY = 400;
 const unsigned long SEGMENTS_SWITCH_OFF_DELAY = 300;
 const int LED_SEGMENT_NUMBER = 17;
 const int SEGMENTS_UP[17] = { 0, 17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255, 272 };
-const int SEGMENTS_DOWN[17] = {288, 271, 254, 237, 220, 203, 186, 169, 152, 135, 118, 101, 84, 67, 50, 33, 16};
+const int SEGMENTS_DOWN[17] = {289, 272, 255, 238, 221, 204, 187, 170, 153, 136, 119, 102, 85, 68, 51, 34, 17};
 
 
 
@@ -83,6 +83,7 @@ void setup() {
 
   // clear everything before
   FastLED.clear();
+  FastLED.show();
   
   startTimeUp = currentTime;             // set initial startTime to time which was already used for initialisation
   startTimeDown = currentTime;           // set initial startTime to time which was already used for initialisation
@@ -104,7 +105,7 @@ void loop() {
     } */
 
   /* IF sequence for bottom to top */
-  if ( pirDownstairs == HIGH && pirDownstairsTriggered == false ) {
+  if ( pirDownstairs == LOW && pirDownstairsTriggered == false ) {
     pirDownstairsTriggered = true;
     Serial.println("pirDownstairs motion detected!");
     if ( currentTime - startTimeUp >= SEGMENTS_SWITCH_ON_DELAY ) {
@@ -202,11 +203,10 @@ void downstairsUpOn( CRGB ledColour ) {
 
 /* function for LED OFF animation of bottom to top */
 void downstairsUpOff(CRGB ledColour) {
-  Serial.println("### off from bottom to top ###");
-  /* if ( downstairsUpSegmentIndexNumber < LED_SEGMENT_NUMBER ) {
+  if ( downstairsUpSegmentIndexNumber < LED_SEGMENT_NUMBER ) {
     // loop from beginning of array number to beginning of next segment (0 to 16 > 17 to 33 > 34 to 50 and so on)
-    for (int downstairsUpLedCounter = SEGMENTS_UP[downstairsUpSegmentIndexNumber]; downstairsUpLedCounter < SEGMENTS_UP[downstairsUpSegmentIndexNumber+1]; downstairsUpLedCounter++ ) {
-      //leds[downstairsUpLedCounter] = ledColour;  // write color to LED
+    for (int downstairsUpLedCounter = SEGMENTS_UP[downstairsUpSegmentIndexNumber]; downstairsUpLedCounter < SEGMENTS_UP[downstairsUpSegmentIndexNumber + 1]; downstairsUpLedCounter++ ) {
+      leds[downstairsUpLedCounter] = ledColour;  // write color to LED
 
       // debug stuff
       //Serial.println((String)"LED Counter: " + downstairsUpLedCounter);
@@ -229,7 +229,7 @@ void downstairsUpOff(CRGB ledColour) {
     downstairsUpSegmentIndexNumber = 0;
     //pirDownstairs = LOW;
     pirDownstairsTriggered = false;
-    } */
+    }
 }
 
 /* function for LED ON animation of top to bottom */
@@ -237,15 +237,12 @@ void upstairsDownOn(CRGB ledColour) {
   // debug stuff
   Serial.println("-------------------------------");
   Serial.println((String)"upstairsDownSegmentIndexNumber: " + upstairsDownSegmentIndexNumber);
-  Serial.println((String)"SEGMENTS_DOWN element 0 = " + SEGMENTS_DOWN[0]);
-  Serial.println((String)"SEGMENTS_DOWN element 1 = " + SEGMENTS_DOWN[1]);
-  Serial.println((String)"SEGMENTS_DOWN element 2 = " + SEGMENTS_DOWN[2]);
 
   // execute the for loop only as much as we have Segments
   if ( upstairsDownSegmentIndexNumber < LED_SEGMENT_NUMBER ) {
     // loop from beginning of array number to beginning of next segment (289 > 272 to 271 > 255 and so on)
-    for (upstairsDownLedCounter = SEGMENTS_DOWN[upstairsDownSegmentIndexNumber]; upstairsDownLedCounter <= SEGMENTS_DOWN[upstairsDownSegmentIndexNumber]; upstairsDownLedCounter++ ) {
-      //leds[upstairsDownLedCounter] = ledColour;  // write color to LED
+    for (upstairsDownLedCounter = SEGMENTS_DOWN[upstairsDownSegmentIndexNumber]; upstairsDownLedCounter <= SEGMENTS_DOWN[upstairsDownSegmentIndexNumber + 1]; upstairsDownLedCounter-- ) {
+      leds[upstairsDownLedCounter] = ledColour;  // write color to LED
 
       // debug stuff
       Serial.println((String)"LED Counter: " + upstairsDownLedCounter);
@@ -276,8 +273,8 @@ void upstairsDownOff(CRGB ledColour) {
   Serial.println("### off from top to bottom ###");
   if ( upstairsDownSegmentIndexNumber < LED_SEGMENT_NUMBER ) {
     // loop from beginning of array number to beginning of next segment (0 to 16 > 17 to 33 > 34 to 50 and so on)
-    for (int upstairsDownLedCounter = SEGMENTS_UP[upstairsDownSegmentIndexNumber]; upstairsDownLedCounter < SEGMENTS_UP[upstairsDownSegmentIndexNumber + 1]; upstairsDownLedCounter++ ) {
-      //leds[upstairsDownLedCounter] = ledColour;  // write color to LED
+    for (int upstairsDownLedCounter = SEGMENTS_UP[upstairsDownSegmentIndexNumber]; upstairsDownLedCounter < SEGMENTS_UP[upstairsDownSegmentIndexNumber + 1]; upstairsDownLedCounter-- ) {
+      leds[upstairsDownLedCounter] = ledColour;  // write color to LED
 
       // debug stuff
       //Serial.println((String)"LED Counter: " + upstairsDownLedCounter);
