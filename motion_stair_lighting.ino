@@ -1,3 +1,21 @@
+/*
+  motion stair lightning
+
+  LEDs that light up step by step in direction of movement when entering a staircase.
+  Also turns off in direction of movement.
+
+  Uses:
+  - one photo resistor to evaluate if it is dark enough to enable pir sensor evaluation
+  - two pir sensors for movement detection after it is dark enough
+  - one LED strip which gets logicaly seperated into multiple areas and
+    lights up step by step after movement has been detected
+
+  segments are set via an array with all start LEDs of the corresponding "logical" segment
+
+*/
+
+
+
 #include <FastLED.h>
 #if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001000)
 #warning "Requires FastLED 3.1 or later; check github for latest code."
