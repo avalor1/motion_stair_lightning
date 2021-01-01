@@ -27,7 +27,7 @@ const unsigned long OFF_TIMEOUT = 1500;
 const unsigned long SEGMENTS_SWITCH_ON_DELAY = 400;
 //delay in ms between segment turn off
 const unsigned long SEGMENTS_SWITCH_OFF_DELAY = 300;
-const int LED_SEGMENT_NUMBER = 2;
+const int LED_SEGMENT_NUMBER = 17;
 const int SEGMENTS_UP[17] = { 0, 17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255, 272 };
 const int SEGMENTS_DOWN[17] = {288, 271, 254, 237, 220, 203, 186, 169, 152, 135, 118, 101, 84, 67, 50, 33, 16};
 
@@ -72,7 +72,7 @@ void setup() {
   pinMode(PIR2_PIN, INPUT);
 
   //FastLED stuff
-  delay(3000); // 3 second delay for recover
+  delay(1500); // 3 second delay for recover
 
   // tell FastLED about the LED strip configuration
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
@@ -80,6 +80,10 @@ void setup() {
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
 
+
+  // clear everything before
+  FastLED.clear();
+  
   startTimeUp = currentTime;             // set initial startTime to time which was already used for initialisation
   startTimeDown = currentTime;           // set initial startTime to time which was already used for initialisation
   delay(1500);                           // wait a short time to get PIR sensors ready
@@ -104,15 +108,15 @@ void loop() {
     pirDownstairsTriggered = true;
     Serial.println("pirDownstairs motion detected!");
     if ( currentTime - startTimeUp >= SEGMENTS_SWITCH_ON_DELAY ) {
-      downstairsUpOn(Magenta);
+      downstairsUpOn(Gold);
       FastLED.show();
       startTimeUp = currentTime;
       //digitalWrite(DATA_PIN, !digitalRead(DATA_PIN));
     }
   } else if ( pirDownstairsTriggered == true ) {
     if ( currentTime - startTimeUp >= SEGMENTS_SWITCH_ON_DELAY ) {
-      downstairsUpOn(Magenta);
-      //FastLED.show();
+      downstairsUpOn(Gold);
+      FastLED.show();
       startTimeUp = currentTime;
       //digitalWrite(DATA_PIN, !digitalRead(DATA_PIN));
     }
@@ -124,14 +128,14 @@ void loop() {
     Serial.println("pirUpstairs motion detected!");
     if ( currentTime - startTimeDown >= SEGMENTS_SWITCH_ON_DELAY ) {
       upstairsDownOn(Magenta);
-      //FastLED.show();
+      FastLED.show();
       startTimeDown = currentTime;
       //digitalWrite(DATA_PIN, !digitalRead(DATA_PIN));
     }
   } else if ( pirUpstairsTriggered == true ) {
     if ( currentTime - startTimeDown >= SEGMENTS_SWITCH_ON_DELAY ) {
       upstairsDownOn(Magenta);
-      //FastLED.show();
+      FastLED.show();
       startTimeDown = currentTime;
       //digitalWrite(DATA_PIN, !digitalRead(DATA_PIN));
     }
@@ -155,7 +159,7 @@ void loop() {
       //Serial.println((String)"upStairsDownOff - current time " + currentTime);
       if ( currentTime - upstairsDownOnAnimationCompleteTime >= OFF_TIMEOUT ) { // check current time against ON animation time to start turning LEDs off
         upstairsDownOff(Black);
-        //FastLED.show();
+        FastLED.show();
       }
     }
   }
