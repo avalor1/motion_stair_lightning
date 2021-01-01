@@ -14,8 +14,6 @@
 
 */
 
-
-
 #include <FastLED.h>
 #if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001000)
 #warning "Requires FastLED 3.1 or later; check github for latest code."
@@ -25,6 +23,7 @@
 #define DATA_PIN    7   //LED data pin
 #define PIR1_PIN    5   //pin for PIR sensor 1
 #define PIR2_PIN    6   //pin for PIR sensor 1
+#define PHO1_PIN    0   //pin for photo sensor (analog pin)
 #define LED_TYPE    WS2812B //type of LED strip
 #define COLOR_ORDER GRB // order of colors
 #define NUM_LEDS    289     //number of leds
@@ -38,6 +37,11 @@ CRGB leds[NUM_LEDS];  //set CRGB color struct to all leds
 #define Black CRGB(0x000000)
 #define Gold CRGB(0xffd700)
 #define Tomatoe CRGB(0xff6347)
+
+// at which analog value we consider it to be dark
+const int ldrDark = 825;
+// at which analog value we consider it to be bright
+const int ldrBright = 300;
 
 // timeout after segments have been turned on
 const unsigned long OFF_TIMEOUT = 1500;
@@ -57,6 +61,7 @@ unsigned long currentTime = 0;
 unsigned long startTimeUp = 0;
 unsigned long startTimeDown = 0;
 int pirState = 0;
+int ldrValue = 0;
 
 // downstairs
 int pirDownstairs = 0;
@@ -90,6 +95,7 @@ void setup() {
   pinMode(PIR1_PIN, INPUT);
   pinMode(PIR2_PIN, INPUT);
 
+
   //FastLED stuff
   delay(1500); // 3 second delay for recover
 
@@ -115,6 +121,7 @@ void setup() {
 void loop() {
   pirDownstairs = digitalRead(PIR1_PIN); // read PIR sensor downstairs
   pirUpstairs = digitalRead(PIR2_PIN);   // read PIR sensor upstairs
+  ldrValue = analogRead(PHO1_PIN);
   currentTime = millis();                // set current time variable to current millis for further usage
 
 
@@ -126,41 +133,50 @@ void loop() {
     Serial.println("No motion!");
     } */
 
-  /* IF sequence for bottom to top */
-  if ( pirDownstairs == HIGH && pirDownstairsTriggered == false ) {
-    pirDownstairsTriggered = true;
-    Serial.println("pirDownstairs motion detected!");
-    if ( currentTime - startTimeUp >= SEGMENTS_SWITCH_ON_DELAY ) {
-      downstairsUpOn(Gold);
-      FastLED.show();
-      startTimeUp = currentTime;
+  /* check light before doing anything */
+  if (ldrValue > ldrDark) {
+
+    /* IF sequence for bottom to top */
+    if ( pirDownstairs == HIGH && pirDownstairsTriggered == false ) {
+      pirDownstairsTriggered = true;
+      Serial.println("pirDownstairs motion detected!");
+      if ( currentTime - startTimeUp >= SEGMENTS_SWITCH_ON_DELAY ) {
+        downstairsUpOn(Gold);
+        FastLED.show();
+        startTimeUp = currentTime;
+      }
+    } else if ( pirDownstairsTriggered == true ) {
+      if ( currentTime - startTimeUp >= SEGMENTS_SWITCH_ON_DELAY ) {
+        downstairsUpOn(Gold);
+        FastLED.show();
+        startTimeUp = currentTime;
+      }
     }
-  } else if ( pirDownstairsTriggered == true ) {
-    if ( currentTime - startTimeUp >= SEGMENTS_SWITCH_ON_DELAY ) {
-      downstairsUpOn(Gold);
-      FastLED.show();
-      startTimeUp = currentTime;
+
+    /* IF sequence for top to bottom */
+    if ( pirUpstairs == HIGH && pirUpstairsTriggered == false ) {
+      pirUpstairsTriggered = true;
+      Serial.println("pirUpstairs motion detected!");
+      if ( currentTime - startTimeDown >= SEGMENTS_SWITCH_ON_DELAY ) {
+        upstairsDownOn(Magenta);
+        FastLED.show();
+        startTimeDown = currentTime;
+      }
+    } else if ( pirUpstairsTriggered == true ) {
+      if ( currentTime - startTimeDown >= SEGMENTS_SWITCH_ON_DELAY ) {
+        upstairsDownOn(Magenta);
+        FastLED.show();
+        startTimeDown = currentTime;
+      }
     }
   }
 
-  /* IF sequence for top to bottom */
-  if ( pirUpstairs == HIGH && pirUpstairsTriggered == false ) {
-    pirUpstairsTriggered = true;
-    Serial.println("pirUpstairs motion detected!");
-    if ( currentTime - startTimeDown >= SEGMENTS_SWITCH_ON_DELAY ) {
-      upstairsDownOn(Magenta);
-      FastLED.show();
-      startTimeDown = currentTime;
-    }
-  } else if ( pirUpstairsTriggered == true ) {
-    if ( currentTime - startTimeDown >= SEGMENTS_SWITCH_ON_DELAY ) {
-      upstairsDownOn(Magenta);
-      FastLED.show();
-      startTimeDown = currentTime;
-    }
-  }
+  /*
+    IF routine for turning off the LEDs
+      does not check light as turning it off should also work if it gets bright during
+      turning it on or while LEDs are on
+  */
 
-  /* IF routine for turning off the LEDs */
   //Serial.println((String)"downstairsUpOnAnimationComplete: " + downstairsUpOnAnimationComplete);
   if ( downstairsUpOnAnimationComplete == true || upstairsDownOnAnimationComplete == true) {  // check if on animation is complete before trying to turn LEDs off
     //Serial.println((String)"downstairsUpOffAnimationTriggered: " + downstairsUpOffAnimationTriggered);
