@@ -204,7 +204,7 @@ void loop() {
 void downstairsUpOn( CRGB ledColour ) {
   // debug stuff
   Serial.println("-------------------------------");
-  Serial.println((String)"upstairsDownSegmentIndexNumber: " + upstairsDownSegmentIndexNumber);
+  Serial.println((String)"downstairsUpSegmentIndexNumber: " + downstairsUpSegmentIndexNumber);
 
   // execute the for loop only as much as we have Segments minus 1 as we start at 0 in the segment array
   if ( downstairsUpSegmentIndexNumber < LED_SEGMENT_NUMBER ) {
@@ -219,9 +219,9 @@ void downstairsUpOn( CRGB ledColour ) {
     downstairsUpSegmentIndexNumber++; // increase index number of up index to get the next element in array for next loop
 
     // debug stuff
-    Serial.println((String)"SEGMENTS_DOWN current segment value: " + SEGMENTS_DOWN[upstairsDownSegmentIndexNumber]);
-    Serial.println((String) "upstairsDownSegmentIndexNumber: " + upstairsDownSegmentIndexNumber);
-    //Serial.println((String) "upstairsDownLedCounterExport: " + upstairsDownLedCounterExport);
+    Serial.println((String)"SEGMENTS_UP current segment value: " + SEGMENTS_UP[downstairsUpSegmentIndexNumber]);
+    Serial.println((String) "downstairsUpSegmentIndexNumber: " + downstairsUpSegmentIndexNumber);
+    //Serial.println((String) "downstairsUpLedCounterExport: " + downstairsUpLedCounterExport);
     Serial.println("-------------------------------");
 
     // add else if for state change when animation is complete and to start timing for turning LEDs off
@@ -258,9 +258,9 @@ void downstairsUpOff(CRGB ledColour) {
     downstairsUpSegmentIndexNumber++; // increase index number of up index to get the next element in array for next loop
 
     // debug stuff
-    Serial.println((String)"SEGMENTS_DOWN current segment value: " + SEGMENTS_DOWN[upstairsDownSegmentIndexNumber]);
-    Serial.println((String) "upstairsDownSegmentIndexNumber: " + upstairsDownSegmentIndexNumber);
-    //Serial.println((String) "upstairsDownLedCounterExport: " + upstairsDownLedCounterExport);
+    Serial.println((String)"SEGMENTS_UP current segment value: " + SEGMENTS_UP[downstairsUpSegmentIndexNumber]);
+    Serial.println((String) "downstairsUpSegmentIndexNumber: " + downstairsUpSegmentIndexNumber);
+    //Serial.println((String) "downstairsUpLedCounterExport: " + downstairsUpLedCounterExport);
     Serial.println("-------------------------------");
 
     // set animation trigger state to true to inform loop about already started turning off routine
