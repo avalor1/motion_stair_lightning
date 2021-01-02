@@ -128,12 +128,14 @@ void loop() {
   //Serial.println(pirDownstairs);
   //Serial.println(pirUpstairs);
 
+
   /* let me know if there is no motion and nothing has been triggered */
   /* if ( pirState == LOW && pirDownstairsTriggered == false && pirUpstairsTriggered == false) {
     Serial.println("No motion!");
     } */
 
   /* check light before doing anything */
+  //Serial.println(ldrValue);
   if (ldrValue > ldrDark) {
 
     /* IF sequence for bottom to top */
@@ -268,13 +270,13 @@ void downstairsUpOff(CRGB ledColour) {
     // set animation trigger state to true to inform loop about already started turning off routine
     downstairsUpOffAnimationTriggered = true;
 
-    } else if ( downstairsUpSegmentIndexNumber == LED_SEGMENT_NUMBER ) {
+  } else if ( downstairsUpSegmentIndexNumber == LED_SEGMENT_NUMBER ) {
     // reset variables to allow toggling of ON routine again
     downstairsUpOnAnimationCompleteTime = 0;
     downstairsUpOnAnimationComplete = false;
     downstairsUpSegmentIndexNumber = 0;
     pirDownstairsTriggered = false;
-    }
+  }
 }
 
 /* function for LED ON animation of top to bottom */
