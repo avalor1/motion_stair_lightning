@@ -74,7 +74,7 @@ int downstairsUpLedCounterExport = 0;
 bool downstairsUpOnAnimationComplete = false;
 unsigned long downstairsUpOnAnimationCompleteTime = 0;
 bool downstairsUpOffAnimationTriggered = false;
-
+bool downstairsUpOffAnimationTrigger = false;
 
 // upstairs
 int pirUpstairs = 0;
@@ -87,7 +87,7 @@ int upstairsDownLedCounterExport = 0;
 bool upstairsDownOnAnimationComplete = false;
 unsigned long upstairsDownOnAnimationCompleteTime = 0;
 bool upstairsDownOffAnimationTriggered = false;
-
+bool upstairsDownOffAnimationTrigger = false;
 
 
 // ------- setup ----------
@@ -119,6 +119,9 @@ void setup() {
   startTimeUp = currentTime;
   // set initial startTime Downstairs to time which was already used for initialisation
   startTimeDown = currentTime;
+
+
+  Serial.println((String)"upstairsDownOn - AnimationCompleteTime " + upstairsDownOnAnimationCompleteTime);
 }
 
 void loop() {
@@ -141,7 +144,7 @@ void loop() {
   //Serial.println(ldrValue);
   //if (ldrValue > ldrDark) {
   //Serial.println(pirDownstairsTriggered);
-  Serial.println(pirUpstairsTriggered);
+  //Serial.println(pirUpstairsTriggered);
     /* IF sequence for bottom to top */
     if ( pirDownstairs == HIGH && pirDownstairsTriggered == false ) {
       pirDownstairsTriggered = true;
@@ -175,6 +178,7 @@ void loop() {
         upstairsDownOn(Magenta);
         FastLED.show();
         startTimeDown = currentTime;
+        //delay(10000);
       }
     }
   //}
@@ -190,7 +194,7 @@ void loop() {
     //////Serial.println((String)"downstairsUpOffAnimationTriggered: " + downstairsUpOffAnimationTriggered);
 
     //////Serial.println((String)"upStairsDownOff - Timeout " + OFF_TIMEOUT + "ms");
-    ////Serial.println((String)"downstairsUpOn - AnimationCompleteTime " + downstairsUpOnAnimationCompleteTime);
+    //Serial.println((String)"downstairsUpOn - AnimationCompleteTime " + downstairsUpOnAnimationCompleteTime);
     //////Serial.println((String)"upStairsDownOff - current time " + currentTime);
     if ( currentTime - downstairsUpOnAnimationCompleteTime >= OFF_TIMEOUT ) { // check current time against ON animation time to start turning LEDs off
       if ( currentTime - startTimeUp >= SEGMENTS_SWITCH_OFF_DELAY ) {
@@ -201,12 +205,13 @@ void loop() {
     }
   }
   Serial.println((String)"upstairsDownOnAnimationComplete: " + upstairsDownOnAnimationComplete);
+  Serial.println((String)"upstairsDownOn - AnimationCompleteTime " + upstairsDownOnAnimationCompleteTime);
   if ( upstairsDownOnAnimationComplete == true ) {
     //////Serial.println((String)"upstairsDownOffAnimationTriggered: " + upstairsDownOffAnimationTriggered);
 
     //////Serial.println((String)"upStairsDownOff - Timeout " + OFF_TIMEOUT + "ms");
     Serial.println((String)"upstairsDownOn - AnimationCompleteTime " + upstairsDownOnAnimationCompleteTime);
-    Serial.println((String)"upStairsDownOff - current time " + currentTime);
+    //Serial.println((String)"upStairsDownOff - current time " + currentTime);
     if ( currentTime - upstairsDownOnAnimationCompleteTime >= OFF_TIMEOUT ) { // check current time against ON animation time to start turning LEDs off
       if ( currentTime - startTimeDown >= SEGMENTS_SWITCH_OFF_DELAY ) {
         upstairsDownOff(Black);
@@ -248,7 +253,8 @@ void downstairsUpOn( CRGB ledColour ) {
     pirDownstairsTriggered = false;
     if ( downstairsUpOnAnimationComplete == false ) {
       // set state for animation to complete but only if it is not already set
-      downstairsUpOnAnimationComplete = true;
+      downstairsUpOffAnimationTrigger = true;
+      downstairsUpOnAnimationComplete = false; 
     }
     // only record Animation complete time once
     // set state for off animation to false to overwrite a set off trigger and allow off triggering again
@@ -288,9 +294,10 @@ void downstairsUpOff(CRGB ledColour) {
     downstairsUpOffAnimationTriggered = true;
 
   }
-  if ( downstairsUpOffSegmentIndexNumber == LED_SEGMENT_NUMBER ) {
+  if ( downstairsUpOffSegmentIndexNumber == LED_SEGMENT_NUMBER && downstairsUpOffAnimationTrigger == true ) {
     // reset variables to allow toggling of ON routine again
     downstairsUpOnAnimationCompleteTime = 0;
+    downstairsUpOffAnimationTrigger = false;
     downstairsUpOnAnimationComplete = false;
     downstairsUpOffSegmentIndexNumber = 0;
     pirDownstairsTriggered = false;
@@ -301,7 +308,7 @@ void downstairsUpOff(CRGB ledColour) {
 void upstairsDownOn(CRGB ledColour) {
   // debug stuff
   Serial.println("-------------------------------");
-  Serial.println((String)"upstairsDownOnSegmentIndexNumber: " + upstairsDownOnSegmentIndexNumber);
+  //Serial.println((String)"upstairsDownOnSegmentIndexNumber: " + upstairsDownOnSegmentIndexNumber);
   Serial.println((String) "DOWN ON: upstairsDownOnAnimationComplete: " + upstairsDownOnAnimationComplete);
   // execute the for loop only as much as we have segments minus 1 as we start at 0 in the segment array
   if ( upstairsDownOnSegmentIndexNumber < LED_SEGMENT_NUMBER ) {
@@ -326,11 +333,13 @@ void upstairsDownOn(CRGB ledColour) {
     pirUpstairsTriggered = false;
     // set state for animation to complete but only if it is not already set
     if (upstairsDownOnAnimationComplete == false) { 
-      upstairsDownOnAnimationComplete = true;
+      upstairsDownOffAnimationTrigger = true;
+      upstairsDownOffAnimationTrigger = true;
     }
     // only record Animation complete time once
     // set state for off animation to false to overwrite a set off trigger and allow off triggering again
-    if ( upstairsDownOnAnimationCompleteTime == 0 ) {
+    if ( upstairsDownOnAnimationCompleteTime == 255 ) {
+      Serial.println((String)"upstairsDownOn Function - AnimationCompleteTime " + upstairsDownOnAnimationCompleteTime);
       upstairsDownOnAnimationCompleteTime = millis();
       upstairsDownOffAnimationTriggered = false;
       upstairsDownOnSegmentIndexNumber = 0;
@@ -367,10 +376,12 @@ void upstairsDownOff(CRGB ledColour) {
 
   }
   
-  if ( upstairsDownOffSegmentIndexNumber == LED_SEGMENT_NUMBER ) {
+  if ( upstairsDownOffSegmentIndexNumber == LED_SEGMENT_NUMBER && upstairsDownOffAnimationTrigger == true ) {
     // reset variables to allow toggling ON routine again
+    Serial.println("################## ich werde jetzt gleich alles von upstairsDown für ein ON vorbereiten");
     upstairsDownOnAnimationCompleteTime = 0;
     upstairsDownOnAnimationComplete = false;
+    upstairsDownOffAnimationTrigger = false;
     upstairsDownOffSegmentIndexNumber = 0;
     pirUpstairsTriggered = false;
   }
