@@ -162,7 +162,7 @@ void loop() {
     pirUpstairsTriggered = true;
     Serial.println("pirUpstairs motion detected!");
   }
-  if ( pirUpstairs == HIGH && pirUpstairsTriggered == false ) {
+  if ( pirUpstairsTriggered == true ) {
     if ( currentTime - startTimeDown >= SEGMENTS_SWITCH_ON_DELAY ) {
       upstairsDownOn(Magenta);
       //FastLED.show();
@@ -217,7 +217,7 @@ void downstairsUpOn( CRGB ledColour ) {
   ////Serial.println("-------------------------------");
   ////Serial.println((String)"downstairsUpOnSegmentIndexNumber: " + downstairsUpOnSegmentIndexNumber);
   switch (downstairsUpOnSegmentIndexNumber) {
-    case 0 ... LED_SEGMENT_NUMBER-1:
+    case 0 ... 16:
       for (int downstairsUpLedCounter = SEGMENTS_UP[downstairsUpOnSegmentIndexNumber]; downstairsUpLedCounter < SEGMENTS_UP[downstairsUpOnSegmentIndexNumber + 1]; downstairsUpLedCounter++ ) {
         leds[downstairsUpLedCounter] = ledColour;  // write color to LED
 
@@ -226,11 +226,17 @@ void downstairsUpOn( CRGB ledColour ) {
         downstairsUpLedCounterExport++; // increase counter export variable to print it outside of for loop
       }
       downstairsUpOnSegmentIndexNumber++; // increase index number of up index to get the next element in array for next loop
+      // debug stuff
+      //Serial.println((String)"UP ON: SEGMENTS_UP current segment value: " + SEGMENTS_UP[downstairsUpOnSegmentIndexNumber]);
+      //Serial.println((String) "UP ON: downstairsUpOnSegmentIndexNumber: " + downstairsUpOnSegmentIndexNumber);
+      //Serial.println((String) "UP ON: downstairsUpLedCounterExport: " + downstairsUpLedCounterExport);
+      //Serial.println("-------------------------------");
       break;
+
     case 17:
       pirDownstairsTriggered = false;
       downstairsUpOffAnimationTrigger = true;
-      downstairsUpOnAnimationComplete = false;
+      downstairsUpOnAnimationComplete = true;
       // only record Animation complete time once
       // set state for off animation to false to overwrite a set off trigger and allow off triggering again
       if ( downstairsUpOnAnimationCompleteTime == 0 ) {
@@ -239,86 +245,56 @@ void downstairsUpOn( CRGB ledColour ) {
         downstairsUpOnSegmentIndexNumber = 0;
       }
       Serial.println("set following variables: ");
-      Serial.println((String)": " + downstairsUpOnSegmentIndexNumber);
+      Serial.println((String)"pirDownstairsTriggered: " + pirDownstairsTriggered);
+      Serial.println((String)"downstairsUpOffAnimationTrigger: " + downstairsUpOffAnimationTrigger);
+      Serial.println((String)"downstairsUpOnAnimationComplete: " + downstairsUpOnAnimationComplete);
+
+      Serial.println((String)"downstairsUpOnAnimationCompleteTime: " + downstairsUpOnAnimationCompleteTime);
+      Serial.println((String)"downstairsUpOffAnimationTriggered: " + downstairsUpOffAnimationTriggered);
+      Serial.println((String)"downstairsUpOnSegmentIndexNumber: " + downstairsUpOnSegmentIndexNumber);
       break;
+
     default:
       break;
-  }
-
-
-  // execute the for loop only as much as we have Segments minus 1 as we start at 0 in the segment array
-  if ( downstairsUpOnSegmentIndexNumber < LED_SEGMENT_NUMBER ) {
-    // loop from beginning of array number to beginning of next segment (0 to 16 > 17 to 33 > 34 to 50 and so on)
-    for (int downstairsUpLedCounter = SEGMENTS_UP[downstairsUpOnSegmentIndexNumber]; downstairsUpLedCounter < SEGMENTS_UP[downstairsUpOnSegmentIndexNumber + 1]; downstairsUpLedCounter++ ) {
-      leds[downstairsUpLedCounter] = ledColour;  // write color to LED
-
-      // debug stuff
-      //////Serial.println((String)"LED Counter: " + downstairsUpLedCounter);
-      downstairsUpLedCounterExport++; // increase counter export variable to print it outside of for loop
-    }
-    downstairsUpOnSegmentIndexNumber++; // increase index number of up index to get the next element in array for next loop
-
-    // debug stuff
-    ////Serial.println((String)"UP ON: SEGMENTS_UP current segment value: " + SEGMENTS_UP[downstairsUpOnSegmentIndexNumber]);
-    ////Serial.println((String) "UP ON: downstairsUpOnSegmentIndexNumber: " + downstairsUpOnSegmentIndexNumber);
-    //////Serial.println((String) "UP ON: downstairsUpLedCounterExport: " + downstairsUpLedCounterExport);
-    ////Serial.println("-------------------------------");
-
-    // add else if for state change when animation is complete and to start timing for turning LEDs off
-  }
-
-  if ( downstairsUpOnSegmentIndexNumber == LED_SEGMENT_NUMBER) {
-    pirDownstairsTriggered = false;
-    if ( downstairsUpOnAnimationComplete == false ) {
-      // set state for animation to complete but only if it is not already set
-      downstairsUpOffAnimationTrigger = true;
-      downstairsUpOnAnimationComplete = false;
-    }
-    // only record Animation complete time once
-    // set state for off animation to false to overwrite a set off trigger and allow off triggering again
-    if ( downstairsUpOnAnimationCompleteTime == 0 ) {
-      downstairsUpOnAnimationCompleteTime = millis();
-      downstairsUpOffAnimationTriggered = false;
-      downstairsUpOnSegmentIndexNumber = 0;
-    }
   }
 }
 
 /* function for LED OFF animation of bottom to top */
 void downstairsUpOff(CRGB ledColour) {
   // debug stuff
-  ////Serial.println("-------------------------------");
-  ////Serial.println((String)"downstairsUpOffSegmentIndexNumber: " + downstairsUpOffSegmentIndexNumber);
+  //Serial.println("-------------------------------");
+  //Serial.println((String)"downstairsUpOffSegmentIndexNumber: " + downstairsUpOffSegmentIndexNumber);
 
-  // execute the for loop only as much as we have segments minus 1 as we start at 0 in the segment array
-  if ( downstairsUpOffSegmentIndexNumber < LED_SEGMENT_NUMBER ) {
-    // loop from beginning of array number to beginning of next segment (0 to 16 > 17 to 33 > 34 to 50 and so on)
-    for (int downstairsUpLedCounter = SEGMENTS_UP[downstairsUpOffSegmentIndexNumber]; downstairsUpLedCounter < SEGMENTS_UP[downstairsUpOffSegmentIndexNumber + 1]; downstairsUpLedCounter++ ) {
-      leds[downstairsUpLedCounter] = ledColour;  // write color to LED
-
+  switch (downstairsUpOffSegmentIndexNumber) {
+    case 0 ... 16:
+      for (int downstairsUpLedCounter = SEGMENTS_UP[downstairsUpOffSegmentIndexNumber]; downstairsUpLedCounter < SEGMENTS_UP[downstairsUpOffSegmentIndexNumber + 1]; downstairsUpLedCounter++ ) {
+        leds[downstairsUpLedCounter] = ledColour;  // write color to LED
+        // debug stuff
+        //////Serial.println((String)"LED Counter: " + downstairsUpLedCounter);
+        downstairsUpLedCounterExport++; // increase counter export variable to print it outside of for loop
+      }
+      downstairsUpOffSegmentIndexNumber++; // increase index number of up index to get the next element in array for next loop
       // debug stuff
-      //////Serial.println((String)"LED Counter: " + downstairsUpLedCounter);
-      downstairsUpLedCounterExport++; // increase counter export variable to print it outside of for loop
-    }
-    downstairsUpOffSegmentIndexNumber++; // increase index number of up index to get the next element in array for next loop
+      //Serial.println((String)"UP OFF: SEGMENTS_UP current segment value: " + SEGMENTS_UP[downstairsUpOffSegmentIndexNumber]);
+      //Serial.println((String) "UP OFF: downstairsUpOffSegmentIndexNumber: " + downstairsUpOffSegmentIndexNumber);
+      //Serial.println((String) "UP OFF: downstairsUpLedCounterExport: " + downstairsUpLedCounterExport);
+      //Serial.println("-------------------------------");
+      break;
 
-    // debug stuff
-    //Serial.println((String)"UP OFF: SEGMENTS_UP current segment value: " + SEGMENTS_UP[downstairsUpOffSegmentIndexNumber]);
-    //Serial.println((String) "UP OFF: downstairsUpOffSegmentIndexNumber: " + downstairsUpOffSegmentIndexNumber);
-    ////Serial.println((String) "UP OFF: downstairsUpLedCounterExport: " + downstairsUpLedCounterExport);
-    //Serial.println("-------------------------------");
+    case 17:
+      // reset variables to allow toggling of ON routine again
+      downstairsUpOnAnimationCompleteTime = 0;
+      //downstairsUpOffAnimationTrigger = false;
+      downstairsUpOnAnimationComplete = false;
+      downstairsUpOffSegmentIndexNumber = 0;
+      pirDownstairsTriggered = false;
 
-    // set animation trigger state to true to inform loop about already started turning off routine
-    downstairsUpOffAnimationTriggered = true;
-
-  }
-  if ( downstairsUpOffSegmentIndexNumber == LED_SEGMENT_NUMBER && downstairsUpOffAnimationTrigger == true ) {
-    // reset variables to allow toggling of ON routine again
-    downstairsUpOnAnimationCompleteTime = 0;
-    downstairsUpOffAnimationTrigger = false;
-    downstairsUpOnAnimationComplete = false;
-    downstairsUpOffSegmentIndexNumber = 0;
-    pirDownstairsTriggered = false;
+      Serial.println("set following variables: ");
+      Serial.println((String)"downstairsUpOnAnimationCompleteTime: " + downstairsUpOnAnimationCompleteTime);
+      Serial.println((String)"downstairsUpOnAnimationComplete: " + downstairsUpOnAnimationComplete);
+      Serial.println((String)"downstairsUpOffSegmentIndexNumber: " + downstairsUpOffSegmentIndexNumber);
+      Serial.println((String)"pirDownstairsTriggered: " + pirDownstairsTriggered);
+      break;
   }
 }
 
@@ -328,8 +304,8 @@ void upstairsDownOn(CRGB ledColour) {
   Serial.println("-------------------------------");
   //Serial.println((String)"upstairsDownOnSegmentIndexNumber: " + upstairsDownOnSegmentIndexNumber);
   Serial.println((String) "DOWN ON: upstairsDownOnAnimationComplete: " + upstairsDownOnAnimationComplete);
-  // execute the for loop only as much as we have segments minus 1 as we start at 0 in the segment array
-  if ( upstairsDownOnSegmentIndexNumber < LED_SEGMENT_NUMBER ) {
+  switch (upstairsDownOnSegmentIndexNumber) {
+  case 0 ... 16:
     // loop from beginning of array number to beginning of next segment (289 > 272 to 271 > 255 and so on)
     for (upstairsDownLedCounter = SEGMENTS_DOWN[upstairsDownOnSegmentIndexNumber]; upstairsDownLedCounter > SEGMENTS_DOWN[upstairsDownOnSegmentIndexNumber + 1]; upstairsDownLedCounter-- ) {
       leds[upstairsDownLedCounter] = ledColour;  // write color to LED
@@ -344,35 +320,38 @@ void upstairsDownOn(CRGB ledColour) {
     Serial.println((String) "DOWN ON: upstairsDownOnSegmentIndexNumber: " + upstairsDownOnSegmentIndexNumber);
     ////Serial.println((String) "DOWN ON: upstairsDownLedCounterExport: " + upstairsDownLedCounterExport);
     //Serial.println("-------------------------------");
+    break;
 
-    // add else if for state change when animation is complete and to start timing for turning LEDs off
-  }
-  if ( upstairsDownOnSegmentIndexNumber == LED_SEGMENT_NUMBER) {
+  case 17:
     pirUpstairsTriggered = false;
-    // set state for animation to complete but only if it is not already set
-    if (upstairsDownOnAnimationComplete == false) {
-      upstairsDownOffAnimationTrigger = true;
-      upstairsDownOffAnimationTrigger = true;
-    }
+    upstairsDownOffAnimationTrigger = true;
+    upstairsDownOnAnimationComplete = true;
     // only record Animation complete time once
     // set state for off animation to false to overwrite a set off trigger and allow off triggering again
-    if ( upstairsDownOnAnimationCompleteTime == 255 ) {
-      Serial.println((String)"upstairsDownOn Function - AnimationCompleteTime " + upstairsDownOnAnimationCompleteTime);
+    if ( downstairsUpOnAnimationCompleteTime == 0 ) {
       upstairsDownOnAnimationCompleteTime = millis();
       upstairsDownOffAnimationTriggered = false;
       upstairsDownOnSegmentIndexNumber = 0;
     }
+    Serial.println("set following variables: ");
+    Serial.println((String)"pirUpstairsTriggered: " + pirUpstairsTriggered);
+    Serial.println((String)"upstairsDownOffAnimationTrigger: " + upstairsDownOffAnimationTrigger);
+    Serial.println((String)"upstairsDownOnAnimationComplete: " + upstairsDownOnAnimationComplete);
+
+    Serial.println((String)"upstairsDownOnAnimationCompleteTime: " + upstairsDownOnAnimationCompleteTime);
+    Serial.println((String)"upstairsDownOffAnimationTriggered: " + upstairsDownOffAnimationTriggered);
+    Serial.println((String)"upstairsDownOnSegmentIndexNumber: " + upstairsDownOnSegmentIndexNumber);
+    break;
   }
 }
 
 // function for LED OFF animation of to to bottom
 void upstairsDownOff(CRGB ledColour) {
   // debug stuff
-  //Serial.println("-------------------------------");
+  Serial.println("-------------------------------");
   //Serial.println((String)"upstairsDownOffSegmentIndexNumber: " + upstairsDownOffSegmentIndexNumber);
-
-  // execute the for loop only as much as we have segments minus 1 as we start at 0 in the segment array
-  if ( upstairsDownOffSegmentIndexNumber < LED_SEGMENT_NUMBER ) {
+  switch (upstairsDownOffSegmentIndexNumber) {
+  case 0 ... 16:
     // loop from beginning of array number to beginning of next segment (0 to 16 > 17 to 33 > 34 to 50 and so on)
     for (int upstairsDownLedCounter = SEGMENTS_DOWN[upstairsDownOffSegmentIndexNumber]; upstairsDownLedCounter > SEGMENTS_DOWN[upstairsDownOffSegmentIndexNumber + 1]; upstairsDownLedCounter-- ) {
       leds[upstairsDownLedCounter] = ledColour;  // write color to LED
@@ -391,16 +370,21 @@ void upstairsDownOff(CRGB ledColour) {
 
     // set animation trigger state to true to inform loop about already started turning off routine
     upstairsDownOffAnimationTriggered = true;
+    break;
 
-  }
-
-  if ( upstairsDownOffSegmentIndexNumber == LED_SEGMENT_NUMBER && upstairsDownOffAnimationTrigger == true ) {
+  case 17:
     // reset variables to allow toggling ON routine again
-    Serial.println("################## ich werde jetzt gleich alles von upstairsDown für ein ON vorbereiten");
     upstairsDownOnAnimationCompleteTime = 0;
     upstairsDownOnAnimationComplete = false;
-    upstairsDownOffAnimationTrigger = false;
+    //upstairsDownOffAnimationTrigger = false;
     upstairsDownOffSegmentIndexNumber = 0;
     pirUpstairsTriggered = false;
+
+    Serial.println("set following variables: ");
+    Serial.println((String)"upstairsDownOnAnimationCompleteTime: " + upstairsDownOnAnimationCompleteTime);
+    Serial.println((String)"upstairsDownOnAnimationComplete: " + upstairsDownOnAnimationComplete);
+    Serial.println((String)"upstairsDownOffSegmentIndexNumber: " + upstairsDownOffSegmentIndexNumber);
+    Serial.println((String)"pirUpstairsTriggered: " + pirUpstairsTriggered);
+    break;
   }
 }
